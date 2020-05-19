@@ -33,6 +33,7 @@ dependencies:
     - gitdb==4.0.5
     - gitpython==3.1.2
     - gym==0.17.2
+    - h5py==2.10.0
     - identify==1.4.15
     - idna==2.9
     - imagecodecs==2020.2.18
@@ -42,6 +43,9 @@ dependencies:
     - importlib-resources==1.5.0
     - jinja2==2.11.2
     - joblib==0.14.1
+    - keras==2.3.1
+    - keras-applications==1.0.8
+    - keras-preprocessing==1.1.1
     - kiwisolver==1.2.0
     - markupsafe==1.1.1
     - matplotlib==3.2.1
