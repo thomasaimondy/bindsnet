@@ -3,6 +3,7 @@ from typing import Optional
 import torch
 import numpy as np
 
+import pdb
 
 def single(
     datum: torch.Tensor, time: int, dt: float = 1.0, sparsity: float = 0.5, **kwargs
@@ -104,6 +105,7 @@ def poisson(datum: torch.Tensor, time: int, dt: float = 1.0, **kwargs) -> torch.
     assert (datum >= 0).all(), "Inputs must be non-negative"
 
     # Get shape and size of data.
+    # pdb.set_trace()
     shape, size = datum.shape, datum.numel()
     datum = datum.flatten()
     time = int(time / dt)
