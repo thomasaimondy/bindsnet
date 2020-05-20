@@ -25,11 +25,15 @@ class Gesture(Dataset):
         # train_x, train_y, train_y_num, 
         # test_x, test_y, test_y_num
         # word_phoneme, word_phoneme_num, word_x
-        self.train_x = m["train_x_100"]  # (5033,189)
+        # pdb.set_trace()
+        # self.train_x = m["train_x_norm"]  # (1176,1024)
+        # self.train_y_num = m["train_y_num"]
+        # self.test_x = m["test_x_norm"]
+        # self.test_y_num = m["test_y_num"]
+        self.train_x = m["train_x_100"]
         self.train_y_num = m["train_y_num"]
         self.test_x = m["test_x_100"]
         self.test_y_num = m["test_y_num"]
-
         self.transform = transform
         if image_encoder is None:
             image_encoder = NullEncoder()
@@ -44,7 +48,7 @@ class Gesture(Dataset):
         return len(self.train_x)
     
     def __getitem__(self,index):
-        vector = torch.Tensor(self.train_x[index,:,:])
+        vector = torch.Tensor(self.train_x[index,:])
         label = torch.Tensor(self.train_y_num[index])
         output = {
                 "image": vector,

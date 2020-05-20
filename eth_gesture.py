@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 from torchvision import transforms
 from tqdm import tqdm
 from time import time as t
-from bindsnet.datasets import MNIST
-from bindsnet.datasets.nettalk import Nettalk
+# from bindsnet.datasets import MNIST
+# from bindsnet.datasets.nettalk import Nettalk
+from bindsnet.datasets.gesture import Gesture
 from bindsnet.encoding import PoissonEncoder
 from bindsnet.models import DiehlAndCook2015
 from bindsnet.network.monitors import Monitor
@@ -32,7 +33,7 @@ parser.add_argument("--n_workers", type=int, default=-1)
 parser.add_argument("--exc", type=float, default=22.5)
 parser.add_argument("--inh", type=float, default=120)
 parser.add_argument("--theta_plus", type=float, default=0.05)
-parser.add_argument("--time", type=int, default=250)
+parser.add_argument("--time", type=int, default=100)
 parser.add_argument("--dt", type=int, default=1.0)
 parser.add_argument("--intensity", type=float, default=128)
 parser.add_argument("--progress_interval", type=int, default=10)
@@ -81,14 +82,14 @@ start_intensity = intensity
 
 # Build network.
 network = DiehlAndCook2015(
-    n_inpt=189,   # (5033,189), 189=3*9*7
+    n_inpt=1024,   # (1176*100*1024)(1176*100*11)
     n_neurons=n_neurons,
     exc=exc,
     inh=inh,
     dt=dt,
     norm=78.4,
     theta_plus=theta_plus,
-    inpt_shape= (1,189)   # mnist (1, 28, 28),
+    inpt_shape= (1,1024)   # mnist (1, 28, 28), nettalk (1,189), 
 )
 
 # Directs network to GPU
@@ -105,9 +106,9 @@ if gpu:
 #         [transforms.ToTensor(), transforms.Lambda(lambda x: x * intensity)]
 #     ),
 # )
-dataset = Nettalk(
-    root_dir="nettalk_small.mat",
-    image_encoder=PoissonEncoder(time=time, dt=dt),
+dataset = Gesture(
+    root_dir="DVS_gesture_100.mat",
+    image_encoder=None, #PoissonEncoder(time=time, dt=dt),
     label_encoder=None,
     transform=None
     )
@@ -115,7 +116,7 @@ dataset = Nettalk(
 spike_record = torch.zeros(update_interval, time, n_neurons)
 
 # Neuron assignments and spike proportions.
-n_classes = 26
+n_classes = 11   # nettalk 26 (116), MNIST 10
 assignments = -torch.ones(n_neurons)
 proportions = torch.zeros(n_neurons, n_classes)
 rates = torch.zeros(n_neurons, n_classes)
@@ -169,7 +170,7 @@ for epoch in range(n_epochs):
     for step, batch in enumerate(tqdm(dataloader)):
         # Get next input sample.
         # inputs = {"X": batch["encoded_image"].view(time, 1, 1, 28, 28)
-        inputs = {"X": batch["encoded_image"].view(time, 1, 1, 189)}
+        inputs = {"X": batch["encoded_image"].view(time, 1, 1, 1024)}
         if gpu:
             inputs = {k: v.cuda() for k, v in inputs.items()}
 
